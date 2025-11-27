@@ -3,6 +3,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import path from 'path'; // Import the 'path' module
+import { fileURLToPath } from 'url'; // Import fileURLToPath
+import { dirname } from 'path'; // Import dirname
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
 
@@ -90,10 +95,15 @@ app.post('/send-brochure', async (req, res) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Message sent: %s', info.messageId);
+    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
     res.status(200).json({ message: 'Brochure sent successfully!' });
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Detailed Error sending email:', error);
+    if (error.response) {
+      console.error('SMTP Response:', error.response);
+    }
     res.status(500).json({ message: 'Failed to send brochure. Please try again later.' });
   }
 });
