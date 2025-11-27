@@ -11,11 +11,39 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Utility function to validate email format
-const isValidEmail = (email) => {
+// Endpoint for email validation using a third-party API
+app.post('/validate-email', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required for validation.' });
+  }
+
+  // --- Placeholder for Third-Party Email Validation API Integration ---
+  // In a real application, you would integrate a service like ZeroBounce, Hunter.io, etc.
+  // Example using a hypothetical service with axios:
+  // try {
+  //   const validationApiUrl = `https://api.thirdpartyvalidator.com/v1/validate?email=${email}&api_key=${process.env.EMAIL_VALIDATION_API_KEY}`;
+  //   const response = await axios.get(validationApiUrl);
+  //   if (response.data.status === 'valid' && response.data.deliverability === 'deliverable') {
+  //     return res.status(200).json({ isValid: true, message: 'Email is valid and deliverable.' });
+  //   } else {
+  //     return res.status(400).json({ isValid: false, message: 'Email is not valid or not deliverable.' });
+  //   }
+  // } catch (error) {
+  //   console.error('Third-party email validation error:', error);
+  //   return res.status(500).json({ message: 'Email validation service error.' });
+  // }
+
+  // For demonstration, simulating a valid email for any non-empty string for now
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
+  if (emailRegex.test(email)) {
+    return res.status(200).json({ isValid: true, message: 'Email format is valid (simulated).' });
+  } else {
+    return res.status(400).json({ isValid: false, message: 'Invalid email format.' });
+  }
+});
+
 
 // Endpoint to send brochure
 app.post('/send-brochure', async (req, res) => {
@@ -25,7 +53,9 @@ app.post('/send-brochure', async (req, res) => {
     return res.status(400).json({ message: 'Email is required.' });
   }
 
-  if (!isValidEmail(email)) {
+  // Basic syntactic validation is still good practice even with a third-party service
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
     return res.status(400).json({ message: 'Invalid email format.' });
   }
 
@@ -49,13 +79,13 @@ app.post('/send-brochure', async (req, res) => {
       <p>Best regards,</p>
       <p>The Ecofynn Team</p>
     `,
-    // attachments: [
-    //   {
-    //     filename: 'Ecofynn_Brochure.pdf',
-    //     path: './brochure.pdf', // Path to your brochure file
-    //     contentType: 'application/pdf',
-    //   },
-    // ],
+    attachments: [
+      {
+        filename: 'Ecofynn_Brochure.pdf',
+        path: './assets/Brochure.pdf', // Corrected relative path to the brochure file
+        contentType: 'application/pdf',
+      },
+    ],
   };
 
   try {
