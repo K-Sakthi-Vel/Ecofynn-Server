@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import path from 'path'; // Import the 'path' module
 
 dotenv.config();
 
@@ -82,7 +83,7 @@ app.post('/send-brochure', async (req, res) => {
     attachments: [
       {
         filename: 'Ecofynn_Brochure.pdf',
-        path: './assets/Brochure.pdf', // Corrected relative path to the brochure file
+        path: path.join(__dirname, 'assets', 'Brochure.pdf'), // Use absolute path for reliability
         contentType: 'application/pdf',
       },
     ],
